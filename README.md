@@ -12,8 +12,7 @@ Rakuten Web Service SDK for PHP は、PHPアプリケーションから
 動作要件
 --------
 
-- PHP5.2.3以上 (PHP5.2.10以上, [curl拡張](http://php.net/manual/ja/book.curl.php) 導入を推奨)
-- PHP5.2.10未満を利用する場合、PEAR の [HTTP_Client](http://pear.php.net/manual/ja/package.http.http-client.php)
+- PHP5.3.0以上 ( [curl拡張](http://php.net/manual/ja/book.curl.php) 導入を推奨)
   か curl拡張の導入が必要です。
 
 ダウンロード
@@ -58,9 +57,11 @@ SDK の利用準備が整います。
 ```php
 <?php
 
-require_once '/path/to/sdk-dir/autoload.php';
+require_once './vendor/autoload.php';
 
-$client = new RakutenRws_Client();
+use RakutenRws\Client;
+
+$client = new Client();
 // アプリID (デベロッパーID) をセットします
 $client->setApplicationId('YOUR_APPLICATION_ID');
 
@@ -81,7 +82,7 @@ if ($response->isOk()) {
 }
 ```
 
-*RakutenRws_Client::execute()* には、API名、パラメータ、バージョンを
+*RakutenRws\Client::execute()* には、API名、パラメータ、バージョンを
 指定します。そのうち、バージョンについては省略することが可能で、
 省略した場合、自動的にSDKが指定した最新バージョンを選択します。
 
@@ -119,9 +120,11 @@ foreach で 情報(商品情報・施設情報など) を順次取得するこ�
 ```php
 <?php
 
-require_once '/path/to/sdk-dir/autoload.php';
+require_once './vendor/autoload.php';
 
-$client = new RakutenRws_Client();
+use RakutenRws\Client;
+
+$client = new Client();
 $client->setApplicationId('YOUR_APPLICATION_ID');
 $client->setAffiliateId('YOUR_AFFILIATE_ID');
 
@@ -148,9 +151,11 @@ APIを使う場合は、 *access_token* を取得する必要があります。
 ```php
 <?php
 
-require_once '/path/to/sdk-dir/autoload.php';
+require_once './vendor/autoload.php';
 
-$client = new RakutenRws_Client();
+use RakutenRws\Client;
+
+$client = new Client();
 // アプリID (デベロッパーID) をセットします
 $client->setApplicationId('YOUR_APPLICATION_ID');
 // Secret をセットします
@@ -169,9 +174,11 @@ echo $client->getAuthorizeUrl('rakuten_favoritebookmark_read');
 ```php
 <?php
 
-require_once '/path/to/sdk-dir/autoload.php';
+require_once './vendor/autoload.php';
 
-$client = new RakutenRws_Client();
+use RakutenRws\Client;
+
+$client = new Client();
 // アプリID (デベロッパーID) をセットします
 $client->setApplicationId('YOUR_APPLICATION_ID');
 // Secret をセットします
@@ -213,9 +220,11 @@ if ($response->isOk()) {
 ```php
 <?php
 
-require_once '/path/to/sdk-dir/autoload.php';
+require_once './vendor/autoload.php';
 
-$client = new RakutenRws_Client();
+use RakutenRws\Client;
+
+$client = new Client();
 $client->setProxy('proxy-host.example.com:port');
 $client->setApplicationId('YOUR_APPLICATION_ID');
 $client->setAffiliateId('YOUR_AFFILIATE_ID');

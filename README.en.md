@@ -8,8 +8,7 @@ Rakuten Web Service SDK for PHP is a library to make it easy to connect to the R
 Requirement
 -----------
 
-- PHP5.2.3+ (Recommended: PHP5.2.10+ with [curl extension](http://php.net/manual/en/book.curl.php))
-- If you want to use this library on PHP5.2.10-, please install [HTTP_Client](http://pear.php.net/manual/en/package.http.http-client.php) on PEAR
+- PHP5.3.0+ (Recommended: with [curl extension](http://php.net/manual/en/book.curl.php))
   or curl extension.
 
 Download
@@ -56,9 +55,11 @@ you can fetch data by following this sample code.
 ```php
 <?php
 
-require_once '/path/to/sdk-dir/autoload.php';
+require_once './vendor/autoload.php';
 
-$client = new RakutenRws_Client();
+use RakutenRws\Client;
+
+$client = new Client();
 // Please set your Application ID
 $client->setApplicationId('YOUR_APPLICATION_ID');
 
@@ -117,9 +118,11 @@ Example:
 ```php
 <?php
 
-require_once '/path/to/sdk-dir/autoload.php';
+require_once './vendor/autoload.php';
 
-$client = new RakutenRws_Client();
+use RakutenRws\Client;
+
+$client = new Client();
 $client->setApplicationId('YOUR_APPLICATION_ID');
 $client->setAffiliateId('YOUR_AFFILIATE_ID');
 
@@ -146,9 +149,11 @@ At the same time, please don't forget the scope in *RakutenRws_Client::getAuthor
 ```php
 <?php
 
-require_once '/path/to/sdk-dir/autoload.php';
+require_once './vendor/autoload.php';
 
-$client = new RakutenRws_Client();
+use RakutenRws\Client;
+
+$client = new Client();
 // Set Application ID
 $client->setApplicationId('YOUR_APPLICATION_ID');
 // Set Application Secret
@@ -167,9 +172,11 @@ You can access API by this *access_token*.
 ```php
 <?php
 
-require_once '/path/to/sdk-dir/autoload.php';
+require_once './vendor/autoload.php';
 
-$client = new RakutenRws_Client();
+use RakutenRws\Client;
+
+$client = new Client();
 // Set Application ID
 $client->setApplicationId('YOUR_APPLICATION_ID');
 // Set Application Secret
@@ -210,9 +217,11 @@ Example:
 ```php
 <?php
 
-require_once '/path/to/sdk-dir/autoload.php';
+require_once './vendor/autoload.php';
 
-$client = new RakutenRws_Client();
+use RakutenRws\Client;
+
+$client = new Client();
 // Set proxy
 $client->setProxy('proxy-host.example.com:port');
 $client->setApplicationId('YOUR_APPLICATION_ID');
