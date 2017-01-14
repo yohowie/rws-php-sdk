@@ -61,9 +61,13 @@ abstract class Base implements ApiInterface
         throw new \LogicException('There is no version definition in this API.');
     }
 
-    public function setVersion($version)
+    /**
+     * @param $version
+     * @param bool $forceVersionCheck
+     */
+    public function setVersion($version, $forceVersionCheck = false)
     {
-        if (!in_array($version, $this->getAvailableVersions())) {
+        if (!$forceVersionCheck && !in_array($version, $this->getAvailableVersions())) {
             throw new RakutenRwsException(sprintf('version %s is not defined.', $version));
         }
 

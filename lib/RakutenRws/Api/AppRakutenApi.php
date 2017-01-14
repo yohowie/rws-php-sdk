@@ -22,9 +22,8 @@ use RakutenRws\ApiResponse\AppRakutenResponse;
  */
 abstract class AppRakutenApi extends Base
 {
-    const BASE_URL = 'https://app.rakuten.co.jp/services/api';
-
     protected
+        $baseUrl = "",
         $isRequiredAccessToken = true,
         $arrayName = "Items",
         $entityName = "Item";
@@ -33,13 +32,16 @@ abstract class AppRakutenApi extends Base
     abstract public function getService();
     abstract public function getOperation();
 
+    public function setBaseUrl($baseUrl) {
+        $this->baseUrl = $baseUrl;
+    }
+
     protected function genUrl()
     {
-        $url  = self::BASE_URL;
+        $url  = $this->baseUrl;
         $url .= '/'.$this->getService();
         $url .= '/'.$this->getOperation();
         $url .= '/'.$this->versionMap[$this->version];
-
         return $url;
     }
 
@@ -92,14 +94,14 @@ abstract class AppRakutenApi extends Base
         return $appresponse;
     }
 
-    public function setVersion($version)
+    public function setVersion($version, $forceVersionCheck = false)
     {
-        $version = preg_replace(
+        $versionSignature = preg_replace(
             '/^(\d{4})(\d{2})(\d{2})$/',
             '\\1-\\2-\\3',
             $version
         );
-
-        parent::setVersion($version);
+        $this->versionMap[$versionSignature] = $version;
+        parent::setVersion($versionSignature, $forceVersionCheck);
     }
 }

@@ -26,7 +26,10 @@ class Client
 {
     const VERSION = '2.0.0-dev';
 
+    const DEFAULT_BASE_URL = 'https://app.rakuten.co.jp/services/api';
+
     protected
+        $baseUrl         = null,
         $developerId     = null,
         $secret          = null,
         $accessToken     = null,
@@ -40,6 +43,7 @@ class Client
      * Client constructor.
      * @param \RakutenRws\AbstractHttpClient|null $httpClient
      * @param array $options
+     * @param $baseUrl API Baseurl if you change.
      *
      *      * option parameter
      *   - keys
@@ -68,7 +72,6 @@ class Client
             }
             // @codeCoverageIgnoreEnd
         }
-
         $this->httpClient = $httpClient;
         $this->options = $options;
     }
@@ -82,6 +85,7 @@ class Client
     public function setApplicationId($developerId)
     {
         $this->developerId = $developerId;
+        return $this;
     }
 
     /**
@@ -102,6 +106,7 @@ class Client
     public function setAffiliateId($affiliateId)
     {
         $this->affiliateId = $affiliateId;
+        return $this;
     }
 
     /**
@@ -122,6 +127,7 @@ class Client
     public function setSecret($secret)
     {
         $this->secret = $secret;
+        return $this;
     }
 
     /**
@@ -132,6 +138,7 @@ class Client
     public function setRedirectUrl($redirectUrl)
     {
         $this->redirectUrl = $redirectUrl;
+        return $this;
     }
 
     /**
@@ -235,6 +242,18 @@ class Client
     public function setProxy($proxy)
     {
         $this->httpClient->setProxy($proxy);
+        return $this;
+    }
+
+    /**
+     * Sets Application Secret
+     *
+     * @param string $secret The Application Secret
+     */
+    public function setBaseUrl($baseUrl)
+    {
+        $this->baseUrl = $baseUrl;
+        return $this;
     }
 
     /**
@@ -243,11 +262,12 @@ class Client
      * @param string $operation The operation name
      * @param array  $parameter The request parameter
      * @param string $version   The API version
+     * @param boolean $forceVersionCheck   The API version
      * @throws \LogicException
      * @throws RakutenRwsException
      * @return mixed
      */
-    public function execute($operation, $parameter = array(), $version = null)
+    public function execute($operation, $parameter = array(), $version = null, $forceVersionCheck = false)
     {
         // remove '/' from operation
         $operation = preg_replace('/\//', '', $operation);
@@ -257,8 +277,9 @@ class Client
         }
 
         $api = new $className($this, $this->options);
+        $api->setBaseUrl($this->baseUrl ? $this->baseUrl : self::DEFAULT_BASE_URL);
         if ($version !== null) {
-            $api->setVersion($version);
+            $api->setVersion($version, $forceVersionCheck);
         }
 
         return $api->execute($parameter);

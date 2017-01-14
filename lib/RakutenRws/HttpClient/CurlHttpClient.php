@@ -26,11 +26,18 @@ class CurlHttpClient extends AbstractHttpClient
     protected
         $curlOptions = array();
 
+    /**
+     * CurlHttpClient constructor.
+     * @param array $options
+     */
     public function __construct($options = array())
     {
         $this->curlOptions = $options;
     }
 
+    /**
+     * @return resource
+     */
     protected function getHandler()
     {
         $ch = curl_init();
@@ -50,6 +57,12 @@ class CurlHttpClient extends AbstractHttpClient
         return $ch;
     }
 
+    /**
+     * @param $url
+     * @param $params
+     * @param $curl
+     * @return HttpResponse
+     */
     protected function makeResponse($url, $params, $curl)
     {
         $rawResponse = curl_exec($curl);
@@ -94,16 +107,28 @@ class CurlHttpClient extends AbstractHttpClient
         );
     }
 
+    /**
+     * @param $options
+     * @return array
+     */
     public function getCurlOptions($options)
     {
         return $this->curlOptions;
     }
 
+    /**
+     * @param $options
+     */
     public function setCurlOptions($options)
     {
         $this->curlOptions = $options;
     }
 
+    /**
+     * @param $url
+     * @param array $params
+     * @return HttpResponse
+     */
     public function get($url, $params = array())
     {
         $requestUrl  = $url;
@@ -112,13 +137,17 @@ class CurlHttpClient extends AbstractHttpClient
             $requestUrl .= http_build_query($params);
         }
 
-        $ch = $this->getHandler();
-
+        $ch = $this->getHandler();var_dump($requestUrl);
         curl_setopt($ch, CURLOPT_URL, $requestUrl);
 
         return $this->makeResponse($url, $params, $ch);
     }
 
+    /**
+     * @param $url
+     * @param array $params
+     * @return HttpResponse
+     */
     public function post($url, $params = array())
     {
         $ch = $this->getHandler();
