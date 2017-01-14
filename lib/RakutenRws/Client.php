@@ -24,7 +24,7 @@ use RakutenRws\HttpClient\PearHttpClient;
  */
 class Client
 {
-    const VERSION = '1.1.1-dev';
+    const VERSION = '2.0.0-dev';
 
     protected
         $developerId     = null,
