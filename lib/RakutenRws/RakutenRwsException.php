@@ -1,5 +1,7 @@
 <?php
 
+namespace RakutenRws;
+
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -10,10 +12,9 @@
  */
 
 /**
- * RakutenRws_Exception
- *
+ * Class RakutenRwsException
  * @package RakutenRws
  */
-class RakutenRws_Exception extends RuntimeException
+class RakutenRwsException extends \RuntimeException
 {
 }

@@ -1,5 +1,7 @@
 <?php
 
+namespace RakutenRws;
+
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -10,11 +12,10 @@
  */
 
 /**
- * RakutenRws_HttpResponse
- *
+ * Class HttpResponse
  * @package RakutenRws
  */
-class RakutenRws_HttpResponse
+class HttpResponse
 {
     protected
         $requestUrl = null,
@@ -23,6 +24,14 @@ class RakutenRws_HttpResponse
         $contents   = null,
         $headers    = null;
 
+    /**
+     * HttpResponse constructor.
+     * @param $requestUrl
+     * @param $parameter
+     * @param $code
+     * @param $headers
+     * @param $contents
+     */
     public function __construct($requestUrl, $parameter, $code, $headers, $contents)
     {
         $this->requestUrl = $requestUrl;

@@ -28,7 +28,7 @@ if ($scheme == 'http' && $port == ':80' || $scheme == 'https' && $port == ':443'
 $url = $scheme.'://'.$_SERVER['HTTP_HOST'].$port.$_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING'];
 
 // Clientインスタンスを生成
-$rwsclient = new RakutenRws_Client();
+$rwsclient = new RakutenRws\Client();
 // アプリIDをセット
 $rwsclient->setApplicationId(RAKUTEN_APP_ID);
 // Secretをセット

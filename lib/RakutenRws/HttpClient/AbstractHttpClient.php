@@ -1,5 +1,6 @@
 <?php
 
+namespace RakutenRws\HttpClient;
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -10,11 +11,10 @@
  */
 
 /**
- * RakutenRws_HttpClient
- *
+ * Class HttpClient
  * @package RakutenRws
  */
-abstract class RakutenRws_HttpClient
+abstract class AbstractHttpClient
 {
     protected
         $proxy = null,

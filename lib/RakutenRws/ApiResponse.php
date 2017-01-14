@@ -1,5 +1,9 @@
 <?php
 
+namespace RakutenRws;
+
+use RakutenRws\HttpResponse;
+
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -14,9 +18,9 @@
  *
  * @package RakutenRws
  */
-abstract class RakutenRws_ApiResponse implements
-    IteratorAggregate,
-    ArrayAccess
+abstract class ApiResponse implements
+    \IteratorAggregate,
+    \ArrayAccess
 {
     protected
         $httpResponse = null,
@@ -31,9 +35,9 @@ abstract class RakutenRws_ApiResponse implements
      * Constructor
      *
      * @param string $operation The operation
-     * @param RakutenRws_HttpResponse $response
+     * @param HttpResponse $response
      */
-    public function __construct($operation, RakutenRws_HttpResponse $response)
+    public function __construct($operation, HttpResponse $response)
     {
         $this->operation = $operation;
         $this->httpResponse  = $response;
@@ -95,7 +99,7 @@ abstract class RakutenRws_ApiResponse implements
     public function setIterator($data)
     {
         if (is_array($data)) {
-            $this->iterator = new ArrayIterator($data);
+            $this->iterator = new \ArrayIterator($data);
 
             return;
         } else if ($data instanceof Iterator) {
@@ -104,7 +108,7 @@ abstract class RakutenRws_ApiResponse implements
             return;
         }
 
-        throw new BadMethodCallException();
+        throw new \BadMethodCallException();
     }
 
     /**
@@ -160,11 +164,11 @@ abstract class RakutenRws_ApiResponse implements
 
     public function offsetSet($offset, $value)
     {
-        throw new LogicException("Cannot set data");
+        throw new \LogicException("Cannot set data");
     }
 
     public function offsetUnset($offset)
     {
-        throw new LogicException("Cannot unset data");
+        throw new \LogicException("Cannot unset data");
     }
 }

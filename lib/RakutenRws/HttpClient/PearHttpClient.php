@@ -1,5 +1,11 @@
 <?php
 
+namespace RakutenRws\HttpClient;
+
+use RakutenRws\Client;
+use RakutenRws\HttpResponse;
+use RakutenRws\RakutenRwsException;
+
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -18,7 +24,7 @@ require_once 'HTTP/Client.php';
  * @package RakutenRws
  * @subpackage HttpClient
  */
-class RakutenRws_HttpClient_PearHttpClient extends RakutenRws_HttpClient
+class PearHttpClient extends AbstractHttpClient
 {
     protected
         $client = null;
@@ -48,7 +54,7 @@ class RakutenRws_HttpClient_PearHttpClient extends RakutenRws_HttpClient
 
         $this->client->setRequestParameter('timeout', $this->timeout);
 
-        $this->client->setDefaultHeader('User-Agent', 'RakutenWebService SDK for PHP-'.RakutenRws_Client::VERSION);
+        $this->client->setDefaultHeader('User-Agent', 'RakutenWebService SDK for PHP-'.Client::VERSION);
 
         return $this->client;
     }
@@ -61,7 +67,7 @@ class RakutenRws_HttpClient_PearHttpClient extends RakutenRws_HttpClient
 
         $response = $client->currentResponse();
 
-        return new RakutenRws_HttpResponse(
+        return new HttpResponse(
             $url,
             $params,
             $response['code'],
@@ -78,7 +84,7 @@ class RakutenRws_HttpClient_PearHttpClient extends RakutenRws_HttpClient
 
         $response = $client->currentResponse();
 
-        return new RakutenRws_HttpResponse(
+        return new HttpResponse(
             $url,
             $params,
             $response['code'],

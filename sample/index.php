@@ -1,9 +1,12 @@
 <?php
 
-require_once dirname(__FILE__).'/../autoload.php';
-
 require_once dirname(__FILE__).'/config.php';
 require_once dirname(__FILE__).'/helper.php';
+
+$loader = require '../vendor/autoload.php';
+$loader->add('RakutenRws', __DIR__.'/../lib/');
+
+use RakutenRws\Client;
 
 $response = null;
 $keyword  = "";
@@ -13,7 +16,7 @@ if (isset($_GET['keyword'])) {
     $page      = isset($_GET['page']) ? $_GET['page'] : 1;
 
     // Clientインスタンスを生成 Make client instance
-    $rwsclient = new RakutenRws_Client();
+    $rwsclient = new Client();
     // アプリIDをセット Set Application ID
     $rwsclient->setApplicationId(RAKUTEN_APP_ID);
     // アフィリエイトIDをセット (任意) Set Affiliate ID (Optional)

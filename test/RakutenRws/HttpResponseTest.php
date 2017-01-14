@@ -1,10 +1,15 @@
 <?php
 
-class RakutenRws_HttpResponseTest extends PHPUnit_Framework_TestCase
+namespace RakutenRws;
+
+use RakutenRws\HttpResponse;
+use PHPUnit\Framework\TestCase;
+
+class HttpResponseTest extends TestCase
 {
     public function test()
     {
-        $response = new RakutenRws_HttpResponse(
+        $response = new HttpResponse(
             'http://example.com',
             array('key' => 'value'),
             200,

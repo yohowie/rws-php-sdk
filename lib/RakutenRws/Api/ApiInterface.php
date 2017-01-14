@@ -1,5 +1,7 @@
 <?php
 
+namespace RakutenRws\Api;
+
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -15,7 +17,7 @@
  * @package RakutenRws
  * @subpackage Api
  */
-interface RakutenRws_Api_ApiInterface
+interface ApiInterface
 {
     public function getAvailableVersions();
     public function getOperationName();

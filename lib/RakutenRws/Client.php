@@ -1,5 +1,14 @@
 <?php
 
+namespace RakutenRws;
+
+use RakutenRws\HttpClient\AbstractHttpClient;
+
+use RakutenRws\HttpClient\CurlHttpClient;
+use RakutenRws\HttpClient\BasicHttpClient;
+use RakutenRws\HttpClient\PearHttpClient;
+
+
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -10,11 +19,10 @@
  */
 
 /**
- * Rakuten Web Service Client
- *
+ * Class Client
  * @package RakutenRws
  */
-class RakutenRws_Client
+class Client
 {
     const VERSION = '1.1.1-dev';
 
@@ -29,19 +37,18 @@ class RakutenRws_Client
         $options         = array();
 
     /**
-     * Constructor.
+     * Client constructor.
+     * @param \RakutenRws\AbstractHttpClient|null $httpClient
+     * @param array $options
      *
-     * @param RakutenRws_HttpClient $httpClient HTTP Client instance
-     * @throws RakutenRws_Exception
-     *
-     * option parameter
+     *      * option parameter
      *   - keys
      */
-    public function __construct(RakutenRws_HttpClient $httpClient = null, $options = array())
+    public function __construct(AbstractHttpClient $httpClient = null, $options = array())
     {
         if (!extension_loaded('openssl')) {
             // @codeCoverageIgnoreStart
-            throw new RakutenRws_Exception('openssl extension is not loaded.');
+            throw new RakutenRwsException('openssl extension is not loaded.');
             // @codeCoverageIgnoreEnd
         }
 
@@ -49,15 +56,16 @@ class RakutenRws_Client
 
             // @codeCoverageIgnoreStart
             if (function_exists('curl_init')) {
-                $httpClient = new RakutenRws_HttpClient_CurlHttpClient();
+                $httpClient = new CurlHttpClient();
             } else if (version_compare(PHP_VERSION, '5.2.10') >= 0) {
-                $httpClient = new RakutenRws_HttpClient_BasicHttpClient();
+                $httpClient = new BasicHttpClient();
             } else {
+                var_dump('else');
                 if (!@include('HTTP/Client.php')) {
-                    throw new RakutenRws_Exception('Failed to include Pear HTTP_Client');
+                    throw new RakutenRwsException('Failed to include Pear HTTP_Client');
                 }
 
-                $httpClient = new RakutenRws_HttpClient_PearHttpClient();
+                $httpClient = new PearHttpClient();
             }
             // @codeCoverageIgnoreEnd
         }
@@ -168,7 +176,7 @@ class RakutenRws_Client
     {
         if ($code === null) {
             if (!isset($_GET['code'])) {
-                throw new LogicException("A parameter code is not set.");
+                throw new \LogicException("A parameter code is not set.");
             }
 
             $code = $_GET['code'];
@@ -213,7 +221,7 @@ class RakutenRws_Client
     /**
      * Gets Http Client instance
      *
-     * @return RakutenRws_HttpClient The Http Client
+     * @@return null|\RakutenRws\AbstractHttpClient|AbstractHttpClient|BasicHttpClient|CurlHttpClient|PearHttpClient  The Http Client
      */
     public function getHttpClient()
     {
@@ -236,17 +244,17 @@ class RakutenRws_Client
      * @param string $operation The operation name
      * @param array  $parameter The request parameter
      * @param string $version   The API version
-     * @throws LogicException
-     * @throws RakutenRws_Exception
+     * @throws \LogicException
+     * @throws RakutenRwsException
+     * @return mixed
      */
     public function execute($operation, $parameter = array(), $version = null)
     {
         // remove '/' from operation
         $operation = preg_replace('/\//', '', $operation);
-
-        $className = 'RakutenRws_Api_Definition_'.$operation;
+        $className = 'RakutenRws\Api\Definition\\'.$operation;
         if (!class_exists($className)) {
-            throw new LogicException('Operation is not definied.');
+            throw new \LogicException('Operation is not definied.');
         }
 
         $api = new $className($this, $this->options);

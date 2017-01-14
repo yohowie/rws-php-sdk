@@ -1,5 +1,9 @@
 <?php
 
+namespace RakutenRws\Api\Definition;
+
+use RakutenRws\Api\AppRakutenApi;
+
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -15,7 +19,7 @@
  * @package RakutenRws
  * @subpackage Api_Definition
  */
-class RakutenRws_Api_Definition_IchibaGenreSearch extends RakutenRws_Api_AppRakutenApi
+class IchibaGenreSearch extends AppRakutenApi
 {
     protected
         $isRequiredAccessToken = false,

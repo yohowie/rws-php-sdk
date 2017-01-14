@@ -1,6 +1,15 @@
 <?php
 
-class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
+namespace RakutenRws;
+
+use PHPUnit\Framework\TestCase;
+
+use RakutenRws\Client;
+use RakutenRws\HttpClient\AbstractHttpClient;
+use RakutenRws\HttpResponse;
+use RakutenRws\ApiResponse;
+
+class ClientTest extends TestCase
 {
     /**
      *
@@ -8,7 +17,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testGetAuthorizeUrl()
     {
-        $clinet = new RakutenRws_Client();
+        $clinet = new Client();
 
         $clinet->setApplicationId('123');
         $clinet->setSecret('foo-bar');
@@ -24,10 +33,10 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testfetchAccessTokenFromCode1()
     {
-        $httpClient = $this->getMock('RakutenRws_HttpClient', array(
-            'post',
-            'get'
-        ), array(), 'HttpClient_for_'.__FUNCTION__);
+        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
+            ->setMethods(['post', 'get'])
+            ->setMockClassName('httpClient_for_'.__FUNCTION__)
+            ->getMock();
 
         $url = 'https://app.rakuten.co.jp/services/token';
         $param = array(
@@ -38,7 +47,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             'redirect_uri'  => 'http://example.com'
         );
 
-        $httpResponse = new RakutenRws_HttpResponse($url, $param, 200, array(), json_encode(array(
+        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
             'access_token'  => 'abc',
             'refresh_token' => 'def',
             'token_type'    => 'BEARER',
@@ -54,7 +63,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($httpResponse));
 
-        $clinet = new RakutenRws_Client($httpClient);
+        $clinet = new Client($httpClient);
 
         $clinet->setApplicationId('123');
         $clinet->setSecret('foo-bar');
@@ -70,10 +79,10 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testfetchAccessTokenFromCode2()
     {
-        $httpClient = $this->getMock('RakutenRws_HttpClient', array(
-            'post',
-            'get'
-        ), array(), 'HttpClient_for_'.__FUNCTION__);
+        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
+            ->setMethods(['post', 'get'])
+            ->setMockClassName('httpClient_for_'.__FUNCTION__)
+            ->getMock();
 
         $url = 'https://app.rakuten.co.jp/services/token';
         $param = array(
@@ -84,7 +93,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             'redirect_uri'  => 'http://example.com'
         );
 
-        $httpResponse = new RakutenRws_HttpResponse($url, $param, 401, array(), json_encode(array(
+        $httpResponse = new HttpResponse($url, $param, 401, array(), json_encode(array(
             'error'             => 'invalid_request',
             'error_description' => 'invalid code'
         )));
@@ -97,7 +106,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($httpResponse));
 
-        $clinet = new RakutenRws_Client($httpClient);
+        $clinet = new Client($httpClient);
 
         $clinet->setApplicationId('123');
         $clinet->setSecret('foo-bar');
@@ -112,10 +121,10 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testfetchAccessTokenFromCode3()
     {
-        $httpClient = $this->getMock('RakutenRws_HttpClient', array(
-            'post',
-            'get'
-        ), array(), 'HttpClient_for_'.__FUNCTION__);
+        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
+            ->setMethods(['post', 'get'])
+            ->setMockClassName('httpClient_for_'.__FUNCTION__)
+            ->getMock();
 
         $url = 'https://app.rakuten.co.jp/services/token';
         $param = array(
@@ -126,7 +135,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             'redirect_uri'  => 'http://example.com'
         );
 
-        $httpResponse = new RakutenRws_HttpResponse($url, $param, 200, array(), json_encode(array(
+        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
             'access_token'  => 'abc',
             'refresh_token' => 'def',
             'token_type'    => 'BEARER',
@@ -142,7 +151,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($httpResponse));
 
-        $clinet = new RakutenRws_Client($httpClient);
+        $clinet = new Client($httpClient);
 
         $clinet->setApplicationId('123');
         $clinet->setSecret('foo-bar');
@@ -160,7 +169,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testfetchAccessTokenFromCode4_Error()
     {
-        $clinet = new RakutenRws_Client();
+        $clinet = new Client();
         unset($_GET['code']);
         $clinet->fetchAccessTokenFromCode();
     }
@@ -171,10 +180,10 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testfetchAccessTokenFromCode5_BrokenData()
     {
-        $httpClient = $this->getMock('RakutenRws_HttpClient', array(
-            'post',
-            'get'
-        ), array(), 'HttpClient_for_'.__FUNCTION__);
+        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
+            ->setMethods(['post', 'get'])
+            ->setMockClassName('httpClient_for_'.__FUNCTION__)
+            ->getMock();
 
         $url = 'https://app.rakuten.co.jp/services/token';
         $param = array(
@@ -185,7 +194,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             'redirect_uri'  => 'http://example.com'
         );
 
-        $httpResponse = new RakutenRws_HttpResponse($url, $param, 200, array(), json_encode(array(
+        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
             'error'             => 'invalid_request',
             'error_description' => 'invalid code'
         )));
@@ -198,7 +207,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($httpResponse));
 
-        $clinet = new RakutenRws_Client($httpClient);
+        $clinet = new Client($httpClient);
 
         $clinet->setApplicationId('123');
         $clinet->setSecret('foo-bar');
@@ -213,7 +222,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testSetProxy()
     {
-        $clinet = new RakutenRws_Client();
+        $clinet = new Client();
         $clinet->setProxy('http://example.com');
         $this->assertEquals('http://example.com', $clinet->getHttpClient()->getProxy());
     }
@@ -225,10 +234,10 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testExecute()
     {
-        $httpClient = $this->getMock('RakutenRws_HttpClient', array(
-            'post',
-            'get'
-        ), array(), 'httpClient_for_'.__FUNCTION__);
+        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
+            ->setMethods(['post', 'get'])
+            ->setMockClassName('httpClient_for_'.__FUNCTION__)
+            ->getMock();
 
         $url = 'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108';
         $param = array(
@@ -236,7 +245,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             'affiliateId'   => '456'
         );
 
-        $httpResponse = new RakutenRws_HttpResponse($url, $param, 200, array(), json_encode(array(
+        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
             'data' => 'the response'
         )));
 
@@ -248,11 +257,11 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($httpResponse));
 
-        $clinet = new RakutenRws_Client($httpClient);
+        $clinet = new Client($httpClient);
         $clinet->setApplicationId('123');
         $clinet->setAffiliateId('456');
         $response = $clinet->execute('DummyAppRakutenApi2');
-        $this->assertInstanceOf('RakutenRws_ApiResponse', $response);
+        $this->assertInstanceOf(ApiResponse::class, $response);
     }
 
     /**
@@ -262,10 +271,10 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testExecuteWithOperationAlias()
     {
-        $httpClient = $this->getMock('RakutenRws_HttpClient', array(
-            'post',
-            'get'
-        ), array(), 'httpClient_for_'.__FUNCTION__);
+        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
+            ->setMethods(['post', 'get'])
+            ->setMockClassName('httpClient_for_'.__FUNCTION__)
+            ->getMock();
 
         $url = 'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108';
         $param = array(
@@ -273,7 +282,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             'affiliateId'   => '456'
         );
 
-        $httpResponse = new RakutenRws_HttpResponse($url, $param, 200, array(), json_encode(array(
+        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
             'data' => 'the response'
         )));
 
@@ -285,11 +294,11 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($httpResponse));
 
-        $clinet = new RakutenRws_Client($httpClient);
+        $clinet = new Client($httpClient);
         $clinet->setApplicationId('123');
         $clinet->setAffiliateId('456');
         $response = $clinet->execute('DummyAppRakuten/Api2');
-        $this->assertInstanceOf('RakutenRws_ApiResponse', $response);
+        $this->assertInstanceOf(ApiResponse::class, $response);
     }
 
     /**
@@ -299,7 +308,7 @@ class RakutenRws_ClientTest extends PHPUnit_Framework_TestCase
      */
     public function testExecute_with_WrongOperation()
     {
-        $clinet = new RakutenRws_Client();
+        $clinet = new Client();
 
         $clinet->execute('WrongOperation');
     }

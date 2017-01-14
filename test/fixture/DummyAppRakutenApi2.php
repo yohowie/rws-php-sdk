@@ -1,6 +1,9 @@
 <?php
+namespace RakutenRws\Api\Definition;
 
-class RakutenRws_Api_Definition_DummyAppRakutenApi2 extends RakutenRws_Api_AppRakutenApi
+use RakutenRws\Api\AppRakutenApi;
+
+class DummyAppRakutenApi2 extends AppRakutenApi
 {
     protected
         $versionMap = array(

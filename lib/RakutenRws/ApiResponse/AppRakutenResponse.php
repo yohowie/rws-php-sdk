@@ -1,5 +1,10 @@
 <?php
 
+namespace RakutenRws\ApiResponse;
+
+use RakutenRws\ApiResponse;
+use RakutenRws\RakutenRwsException;
+
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -15,7 +20,7 @@
  * @package RakutenRws
  * @subpackage ApiResponse
  */
-class RakutenRws_ApiResponse_AppRakutenResponse extends RakutenRws_ApiResponse
+class AppRakutenResponse extends ApiResponse
 {
     protected function handleResponse()
     {
@@ -29,10 +34,9 @@ class RakutenRws_ApiResponse_AppRakutenResponse extends RakutenRws_ApiResponse
         }
 
         $rawData = json_decode($this->httpResponse->getContents(), true);
-
         if (null === $rawData)
         {
-            throw new RakutenRws_Exception();
+            throw new RakutenRwsException();
         }
 
         $this->data = $rawData;

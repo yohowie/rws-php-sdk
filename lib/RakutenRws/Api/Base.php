@@ -1,5 +1,10 @@
 <?php
 
+namespace RakutenRws\Api;
+
+use RakutenRws\Client;
+use RakutenRws\RakutenRwsException;
+
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -15,7 +20,7 @@
  * @package RakutenRws
  * @subpackage Api
  */
-abstract class RakutenRws_Api_Base implements RakutenRws_Api_ApiInterface
+abstract class Base implements ApiInterface
 {
     protected
         $version         = null,
@@ -24,7 +29,7 @@ abstract class RakutenRws_Api_Base implements RakutenRws_Api_ApiInterface
         $autoSetIterator = false,
         $options         = array();
 
-    public function __construct(RakutenRws_Client $client, $options = array())
+    public function __construct(Client $client, $options = array())
     {
         $this->options = $options;
         $this->client  = $client;
@@ -53,13 +58,13 @@ abstract class RakutenRws_Api_Base implements RakutenRws_Api_ApiInterface
             return $version;
         }
 
-        throw new LogicException('There is no version definition in this API.');
+        throw new \LogicException('There is no version definition in this API.');
     }
 
     public function setVersion($version)
     {
         if (!in_array($version, $this->getAvailableVersions())) {
-            throw new RakutenRws_Exception(sprintf('version %s is not defined.', $version));
+            throw new RakutenRwsException(sprintf('version %s is not defined.', $version));
         }
 
         $this->version = $version;

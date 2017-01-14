@@ -1,5 +1,9 @@
 <?php
 
+namespace RakutenRws\Api\Definition;
+
+use RakutenRws\Api\AppRakutenApi;
+use RakutenRws\RakutenRwsException;
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -15,7 +19,7 @@
  * @package RakutenRws
  * @subpackage Api_Definition
  */
-class RakutenRws_Api_Definition_AuctionGenreKeywordSearch extends RakutenRws_Api_AppRakutenApi
+class AuctionGenreKeywordSearch extends AppRakutenApi
 {
     protected
         $isRequiredAccessToken = false,
@@ -40,7 +44,7 @@ class RakutenRws_Api_Definition_AuctionGenreKeywordSearch extends RakutenRws_Api
         if ($appresponse->isOk()) {
             $data = $appresponse->getData();
             if (!isset($data['auctionGenreList'])) {
-                throw new RakutenRws_Exception();
+                throw new RakutenRwsException();
             }
 
             $appresponse->setIterator($data['auctionGenreList']);

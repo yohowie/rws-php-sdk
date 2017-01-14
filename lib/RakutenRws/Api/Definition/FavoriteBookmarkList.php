@@ -1,5 +1,10 @@
 <?php
 
+namespace RakutenRws\Api\Definition;
+
+use RakutenRws\Api\AppRakutenApi;
+use RakutenRws\RakutenRwsException;
+
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -15,7 +20,7 @@
  * @package RakutenRws
  * @subpackage Api_Definition
  */
-class RakutenRws_Api_Definition_FavoriteBookmarkList extends RakutenRws_Api_AppRakutenApi
+class FavoriteBookmarkList extends AppRakutenApi
 {
     protected
         $versionMap = array(
@@ -39,7 +44,7 @@ class RakutenRws_Api_Definition_FavoriteBookmarkList extends RakutenRws_Api_AppR
         if ($response->isOk()) {
             $data = $response->getData();
             if (!isset($data['items'])) {
-                throw new RakutenRws_Exception();
+                throw new RakutenRwsException();
             }
 
             $items = array();

@@ -1,5 +1,11 @@
 <?php
 
+namespace RakutenRws\HttpClient;
+
+use RakutenRws\HttpClient\AbstractHttpClient;
+use RakutenRws\HttpResponse;
+use RakutenRws\Client;
+
 /**
  * This file is part of Rakuten Web Service SDK
  *
@@ -16,7 +22,7 @@
  * @package RakutenRws
  * @subpackage HttpClient
  */
-class RakutenRws_HttpClient_BasicHttpClient extends RakutenRws_HttpClient
+class BasicHttpClient extends AbstractHttpClient
 {
     protected function getStreamContext($url, $params, $method = 'GET')
     {
@@ -28,7 +34,7 @@ class RakutenRws_HttpClient_BasicHttpClient extends RakutenRws_HttpClient
         );
 
         $headers = array(
-            'header' => 'User-Agent: RakutenWebService SDK for PHP-'.RakutenRws_Client::VERSION,
+            'header' => 'User-Agent: RakutenWebService SDK for PHP-'.Client::VERSION,
         );
 
         if ($method === 'POST') {
@@ -85,7 +91,7 @@ class RakutenRws_HttpClient_BasicHttpClient extends RakutenRws_HttpClient
         $contents = @file_get_contents($requestUrl, false, $context);
         $headerInfo = $this->parseHeader($http_response_header);
 
-        return new RakutenRws_HttpResponse(
+        return new HttpResponse(
             $url,
             $params,
             $headerInfo['code'],
@@ -100,7 +106,7 @@ class RakutenRws_HttpClient_BasicHttpClient extends RakutenRws_HttpClient
         $contents = @file_get_contents($url, false, $context);
         $headerInfo = $this->parseHeader($http_response_header);
 
-        return new RakutenRws_HttpResponse(
+        return new HttpResponse(
             $url,
             $params,
             $headerInfo['code'],
