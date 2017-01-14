@@ -60,7 +60,6 @@ class Client
             } else if (version_compare(PHP_VERSION, '5.2.10') >= 0) {
                 $httpClient = new BasicHttpClient();
             } else {
-                var_dump('else');
                 if (!@include('HTTP/Client.php')) {
                     throw new RakutenRwsException('Failed to include Pear HTTP_Client');
                 }
