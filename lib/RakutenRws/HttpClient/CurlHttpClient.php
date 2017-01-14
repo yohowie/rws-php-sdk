@@ -137,7 +137,7 @@ class CurlHttpClient extends AbstractHttpClient
             $requestUrl .= http_build_query($params);
         }
 
-        $ch = $this->getHandler();var_dump($requestUrl);
+        $ch = $this->getHandler();
         curl_setopt($ch, CURLOPT_URL, $requestUrl);
 
         return $this->makeResponse($url, $params, $ch);
