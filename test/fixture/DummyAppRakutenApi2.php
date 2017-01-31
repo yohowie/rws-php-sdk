@@ -9,7 +9,8 @@ class DummyAppRakutenApi2 extends AppRakutenApi
         $versionMap = array(
             '1989-01-08' => '19890108'
         ),
-        $isRequiredAccessToken = false;
+	$isRequiredAccessToken = false,
+        $baseUrl = 'https://app.rakuten.co.jp/services/api';
 
     public function getService()
     {

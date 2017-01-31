@@ -11,7 +11,8 @@ class DummyAppRakutenApi1 extends AppRakutenApi
             '1989-01-08' => '19890108',
             '2012-01-08' => '20120108'
         ),
-        $autoSetIterator = true;
+        $autoSetIterator = true,
+        $baseUrl = 'https://app.rakuten.co.jp/services/api';
 
     public function getService()
     {

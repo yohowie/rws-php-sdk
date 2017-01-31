@@ -8,7 +8,8 @@ class DummyAppRakutenApi3 extends AppRakutenApi
     protected
         $versionMap = array(
             '1989-01-08' => '19890108'
-        );
+	),
+        $baseUrl = 'https://app.rakuten.co.jp/services/api';
 
     public function getService()
     {

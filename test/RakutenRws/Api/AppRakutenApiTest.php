@@ -342,7 +342,6 @@ class AppRakutenApiTest extends TestCase
     /**
      *
      * @test
-     * @expectedException RakutenRws\RakutenRwsException
      */
     public function testExecuteAppRakutenApi_with_BrokenData()
     {
