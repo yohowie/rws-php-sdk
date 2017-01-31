@@ -79,15 +79,12 @@ abstract class AppRakutenApi extends Base
 
         if ($this->autoSetIterator && $appresponse->isOk()) {
             $data = $appresponse->getData();
-            if (!isset($data[$this->arrayName])) {
-                throw new RakutenRwsException();
-            }
-
             $items = array();
-            foreach ($data[$this->arrayName] as $item) {
-                $items[] = $item[$this->entityName];
+            if (isset($data[$this->arrayName])) {
+                foreach ($data[$this->arrayName] as $item) {
+                    $items[] = $item[$this->entityName];
+                }
             }
-
             $appresponse->setIterator($items);
         }
 
@@ -101,7 +98,9 @@ abstract class AppRakutenApi extends Base
             '\\1-\\2-\\3',
             $version
         );
-        $this->versionMap[$versionSignature] = $version;
+        if ( $forceVersionCheck) {
+            $this->versionMap[$versionSignature] = $version;
+        }
         parent::setVersion($versionSignature, $forceVersionCheck);
     }
 }
