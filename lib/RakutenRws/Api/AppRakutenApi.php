@@ -4,6 +4,9 @@ namespace RakutenRws\Api;
 
 use RakutenRws\RakutenRwsException;
 use RakutenRws\ApiResponse\AppRakutenResponse;
+use RakutenRws\HttpResponse;
+
+use GuzzleHttp\Promise\Promise;
 
 /**
  * This file is part of Rakuten Web Service SDK
@@ -50,10 +53,8 @@ abstract class AppRakutenApi extends Base
         return 'GET';
     }
 
-    public function execute($parameter)
+    protected function buildParameters($parameter)
     {
-        $url = $this->genUrl();
-
         if ($this->isRequiredAccessToken) {
             $parameter['access_token'] = $this->client->getAccessToken();
         } else {
@@ -67,15 +68,26 @@ abstract class AppRakutenApi extends Base
         unset($parameter['callback']);
         unset($parameter['format']);
 
-        $client = $this->client->getHttpClient();
-        $method = 'get';
-        if (strtoupper($this->getMethod()) !== 'GET') {
-            $method = 'post';
-        }
+        return $parameter;
+    }
 
-        $response = $client->$method($url, $parameter);
+    /**
+     * @param $url
+     * @param $parameter
+     * @param $response
+     * @return AppRakutenResponse
+     */
+    protected function buildResponse($url, $parameter, $response)
+    {
+        $httpResponse = new HttpResponse(
+            $url,
+            $parameter,
+            $response->getStatusCode(),
+            $response->getHeaders(),
+            $response->getBody()->getContents()
+        );
 
-        $appresponse = new AppRakutenResponse($this->getOperationName(), $response);
+        $appresponse = new AppRakutenResponse($this->getOperationName(), $httpResponse);
 
         if ($this->autoSetIterator && $appresponse->isOk()) {
             $data = $appresponse->getData();
@@ -91,6 +103,54 @@ abstract class AppRakutenApi extends Base
         return $appresponse;
     }
 
+    /**
+     * @param $parameter
+     * @return AppRakutenResponse
+     */
+    public function execute($parameter)
+    {
+        $url = $this->genUrl();
+        $method = 'GET';
+        if (strtoupper($this->getMethod()) !== 'GET') {
+            $method = 'POST';
+        }
+
+        $options = ['http_errors' => false];
+        $options[$method == 'POST' ? 'form_params' : 'query'] = $this->buildParameters($parameter);
+        $client = $this->client->getHttpClient();
+        $response = $client->request($method, $url, $options);
+        return $this->buildResponse($url, $parameter, $response);
+    }
+
+    /**
+     * @param $parameter
+     * @return Promise
+     */
+    public function executeAsync($parameter)
+    {
+        $promise = new Promise(function () use (&$promise, $parameter) {
+
+            $url = $this->genUrl();
+            $method = 'GET';
+            if (strtoupper($this->getMethod()) !== 'GET') {
+                $method = 'POST';
+            }
+
+            $options = ['http_errors' => false];
+            $options[$method == 'POST' ? 'form_params' : 'query'] = $this->buildParameters($parameter);
+            $client = $this->client->getHttpClient();
+            $response = $client->requestAsync($method, $url, $options)->wait();
+
+            $promise->resolve($this->buildResponse($url, $parameter, $response));
+
+        });
+        return $promise;
+    }
+
+    /**
+     * @param $version
+     * @param bool $forceVersionCheck
+     */
     public function setVersion($version, $forceVersionCheck = false)
     {
         $versionSignature = preg_replace(

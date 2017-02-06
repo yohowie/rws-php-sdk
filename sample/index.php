@@ -28,11 +28,11 @@ if (isset($_GET['keyword'])) {
 
     // 楽天市場商品検索API2 で商品を検索します
     // Search by IchibaItemSearch (http://webservice.rakuten.co.jp/api/ichibaitemsearch/)
-    $response = $rwsclient->execute('IchibaItemSearch', array(
+    $response = $rwsclient->executeAsync('IchibaItemSearch', array(
         'keyword' => $keyword,
         'page'    => $page,
         'hits'    => 9
-    ));
+    ))->wait();
 }
 
 ?><!DOCTYPE html>

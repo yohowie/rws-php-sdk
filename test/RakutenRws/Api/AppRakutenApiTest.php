@@ -3,13 +3,18 @@
 namespace RakutenRws\Api;
 
 use PHPUnit\Framework\TestCase;
-use RakutenRws\HttpResponse;
-use RakutenRws\Client;
-use RakutenRws\HttpClient\AbstractHttpClient;
 use RakutenRws\Api\Definition\DummyAppRakutenApi1;
 use RakutenRws\Api\Definition\DummyAppRakutenApi2;
 use RakutenRws\Api\Definition\DummyAppRakutenApi3;
-use RakutenRws\RakutenRwsException;
+use RakutenRws\HttpResponse;
+use RakutenRws\Client;
+
+use GuzzleHttp\Psr7\Response;
+
+use \Mockery;
+
+use GuzzleHttp\Client as GClient;
+
 
 
 
@@ -21,40 +26,34 @@ class AppRakutenApiTest extends TestCase
      */
     public function testExecuteAppRakutenApi()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $url = 'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation1/19890108';
-        $param = array(
-            'access_token' => 'abc'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
-            'Items' => array(array('Item' => 'data'))
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('get')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('request')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
+                'GET',
+                'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation1/19890108',
+                [
+                    'http_errors' => false,
+                    'query' => [
+                        'access_token' => 'abc',
+                        'affiliateId' => '456'
+                    ]
+                ]
             )
-            ->will($this->returnValue($httpResponse));
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'Items' => array(array('Item' => 'data'))
+            ])));
 
-        $rwsClient = $this->getMockBuilder(Client::class)
-            ->setMethods(['getAccessToken', 'getHttpClient'])
-            ->setMockClassName('rwsClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $rwsClient->expects($this->once())
-            ->method('getHttpClient')
-            ->will($this->returnValue($httpClient));
-
-        $rwsClient->expects($this->once())
-            ->method('getAccessToken')
-            ->will($this->returnValue('abc'));
+        $rwsClient = Mockery::mock(Client::class);
+        $rwsClient
+            ->shouldReceive('getHttpClient')
+            ->andReturn($httpClient)
+            ->shouldReceive('getAccessToken')
+            ->andReturn('abc')
+            ->shouldReceive('getApplicationId')
+            ->andReturn('123')
+            ->shouldReceive('getAffiliateId')
+            ->andReturn('456');
 
         $api = new DummyAppRakutenApi1($rwsClient);
         $response = $api->execute(array());
@@ -73,45 +72,34 @@ class AppRakutenApiTest extends TestCase
      */
     public function testExecuteNonAuthorizedAppRakutenApi()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $url = 'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108';
-        $param = array(
-            'applicationId' => '123',
-            'affiliateId'   => '456'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
-            'data' => 'the response'
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('get')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('request')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
+                'GET',
+                'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108',
+                [
+                    'http_errors' => false,
+                    'query' => [
+                        'applicationId' => '123',
+                        'affiliateId'   => '456'
+                    ]
+                ]
             )
-            ->will($this->returnValue($httpResponse));
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'data' => 'the response'
+            ])));
 
-        $rwsClient = $this->getMockBuilder(Client::class)
-            ->setMethods(['getHttpClient', 'getApplicationId', 'getAffiliateId'])
-            ->setMockClassName('rwsClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $rwsClient->expects($this->once())
-            ->method('getHttpClient')
-            ->will($this->returnValue($httpClient));
-
-        $rwsClient->expects($this->once())
-            ->method('getApplicationId')
-            ->will($this->returnValue('123'));
-
-        $rwsClient->expects($this->any())
-            ->method('getAffiliateId')
-            ->will($this->returnValue('456'));
+        $rwsClient = Mockery::mock(Client::class);
+        $rwsClient
+            ->shouldReceive('getHttpClient')
+            ->andReturn($httpClient)
+            ->shouldReceive('getAccessToken')
+            ->andReturn('abc')
+            ->shouldReceive('getApplicationId')
+            ->andReturn('123')
+            ->shouldReceive('getAffiliateId')
+            ->andReturn('456');
 
         $api = new DummyAppRakutenApi2($rwsClient);
         $response = $api->execute(array());
@@ -130,41 +118,34 @@ class AppRakutenApiTest extends TestCase
      */
     public function testExecutePostAppRakutenApi()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $url = 'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation3/19890108';
-        $param = array(
-            'access_token' => 'abc'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
-            'data' => 'the response'
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('post')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('request')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
+                'POST',
+                "https://app.rakuten.co.jp/services/api/DummyService/DummyOperation3/19890108",
+                [
+                    'http_errors' => false,
+                    'form_params' => [
+                        'access_token' => 'abc',
+                        'affiliateId'   => '456'
+                    ]
+                ]
             )
-            ->will($this->returnValue($httpResponse));
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'data' => 'the response'
+            ])));
 
-
-        $rwsClient = $this->getMockBuilder(Client::class)
-            ->setMethods(['getHttpClient', 'getAccessToken'])
-            ->setMockClassName('rwsClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $rwsClient->expects($this->once())
-            ->method('getHttpClient')
-            ->will($this->returnValue($httpClient));
-
-        $rwsClient->expects($this->once())
-            ->method('getAccessToken')
-            ->will($this->returnValue('abc'));
+        $rwsClient = Mockery::mock(Client::class);
+        $rwsClient
+            ->shouldReceive('getHttpClient')
+            ->andReturn($httpClient)
+            ->shouldReceive('getAccessToken')
+            ->andReturn('abc')
+            ->shouldReceive('getApplicationId')
+            ->andReturn('123')
+            ->shouldReceive('getAffiliateId')
+            ->andReturn('456');
 
         $api = new DummyAppRakutenApi3($rwsClient);
         $response = $api->execute(array());
@@ -216,7 +197,7 @@ class AppRakutenApiTest extends TestCase
     /**
      *
      * @test
-     * @expectedException RakutenRws\RakutenRwsException
+     * @expectedException \RakutenRws\RakutenRwsException
      */
     public function testSetVersion_When_Sets_Wrong_Version()
     {
@@ -231,45 +212,34 @@ class AppRakutenApiTest extends TestCase
      */
     public function testExecuteNonAuthorizedAppRakutenApi_With_callback()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $url = 'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108';
-        $param = array(
-            'applicationId' => '123',
-            'affiliateId'   => '456'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
-            'data' => 'the response'
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('get')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('request')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
+                'GET',
+                'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108',
+                [
+                    'http_errors' => false,
+                    'query' => [
+                        'applicationId' => '123',
+                        'affiliateId'   => '456'
+                    ]
+                ]
             )
-            ->will($this->returnValue($httpResponse));
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'data' => 'the response'
+            ])));
 
-        $rwsClient = $this->getMockBuilder(Client::class)
-            ->setMethods(['getHttpClient', 'getAccessToken', 'getAffiliateId', 'getApplicationId'])
-            ->setMockClassName('rwsClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $rwsClient->expects($this->once())
-            ->method('getHttpClient')
-            ->will($this->returnValue($httpClient));
-
-        $rwsClient->expects($this->once())
-            ->method('getApplicationId')
-            ->will($this->returnValue('123'));
-
-        $rwsClient->expects($this->any())
-            ->method('getAffiliateId')
-            ->will($this->returnValue('456'));
+        $rwsClient = Mockery::mock(Client::class);
+        $rwsClient
+            ->shouldReceive('getHttpClient')
+            ->andReturn($httpClient)
+            ->shouldReceive('getAccessToken')
+            ->andReturn('abc')
+            ->shouldReceive('getApplicationId')
+            ->andReturn('123')
+            ->shouldReceive('getAffiliateId')
+            ->andReturn('456');
 
         $api = new DummyAppRakutenApi2($rwsClient);
         $response = $api->execute(array('callback' => 'it_will_be_deleted'));
@@ -288,45 +258,35 @@ class AppRakutenApiTest extends TestCase
      */
     public function testExecuteNonAuthorizedAppRakutenApi_With_format()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
 
-        $url = 'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108';
-        $param = array(
-            'applicationId' => '123',
-            'affiliateId'   => '456'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
-            'data' => 'the response'
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('get')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('request')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
+                'GET',
+                "https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108",
+                [
+                    'http_errors' => false,
+                    'query' => [
+                        'applicationId' => '123',
+                        'affiliateId'   => '456'
+                    ]
+                ]
             )
-            ->will($this->returnValue($httpResponse));
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'data' => 'the response'
+            ])));
 
-        $rwsClient = $this->getMockBuilder(Client::class)
-            ->setMethods(['getHttpClient', 'getAccessToken', 'getAffiliateId', 'getApplicationId'])
-            ->setMockClassName('rwsClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $rwsClient->expects($this->once())
-            ->method('getHttpClient')
-            ->will($this->returnValue($httpClient));
-
-        $rwsClient->expects($this->once())
-            ->method('getApplicationId')
-            ->will($this->returnValue('123'));
-
-        $rwsClient->expects($this->any())
-            ->method('getAffiliateId')
-            ->will($this->returnValue('456'));
+        $rwsClient = Mockery::mock(Client::class);
+        $rwsClient
+            ->shouldReceive('getHttpClient')
+            ->andReturn($httpClient)
+            ->shouldReceive('getAccessToken')
+            ->andReturn('abc')
+            ->shouldReceive('getApplicationId')
+            ->andReturn('123')
+            ->shouldReceive('getAffiliateId')
+            ->andReturn('456');
 
         $api = new DummyAppRakutenApi2($rwsClient);
         $response = $api->execute(array('format' => 'it_will_be_deleted'));
@@ -345,40 +305,34 @@ class AppRakutenApiTest extends TestCase
      */
     public function testExecuteAppRakutenApi_with_BrokenData()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $url = 'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation1/19890108';
-        $param = array(
-            'access_token' => 'abc'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
-            'Ooooooohhhhhhhh!!!!'
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('get')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('request')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
+                'GET',
+                "https://app.rakuten.co.jp/services/api/DummyService/DummyOperation1/19890108",
+                [
+                    'http_errors' => false,
+                    'query' => [
+                        'access_token' => 'abc',
+                        'affiliateId'   => '456'
+                    ]
+                ]
             )
-            ->will($this->returnValue($httpResponse));
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'Ooooooohhhhhhhh!!!!'
+            ])));
 
-        $rwsClient = $this->getMockBuilder(Client::class)
-            ->setMethods(['getHttpClient', 'getAccessToken'])
-            ->setMockClassName('rwsClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $rwsClient->expects($this->once())
-            ->method('getHttpClient')
-            ->will($this->returnValue($httpClient));
-
-        $rwsClient->expects($this->once())
-            ->method('getAccessToken')
-            ->will($this->returnValue('abc'));
+        $rwsClient = Mockery::mock(Client::class);
+        $rwsClient
+            ->shouldReceive('getHttpClient')
+            ->andReturn($httpClient)
+            ->shouldReceive('getAccessToken')
+            ->andReturn('abc')
+            ->shouldReceive('getApplicationId')
+            ->andReturn('123')
+            ->shouldReceive('getAffiliateId')
+            ->andReturn('456');
 
         $api = new DummyAppRakutenApi1($rwsClient);
         $api->execute(array());

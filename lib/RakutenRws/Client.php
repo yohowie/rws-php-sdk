@@ -2,12 +2,9 @@
 
 namespace RakutenRws;
 
-use RakutenRws\HttpClient\AbstractHttpClient;
+use GuzzleHttp\Client as GClient;
 
-use RakutenRws\HttpClient\CurlHttpClient;
-use RakutenRws\HttpClient\BasicHttpClient;
-use RakutenRws\HttpClient\PearHttpClient;
-
+use RakutenRws\RakutenRwsException;
 
 /**
  * This file is part of Rakuten Web Service SDK
@@ -41,14 +38,13 @@ class Client
 
     /**
      * Client constructor.
-     * @param \RakutenRws\AbstractHttpClient|null $httpClient
      * @param array $options
      * @param $baseUrl API Baseurl if you change.
      *
      *      * option parameter
      *   - keys
      */
-    public function __construct(AbstractHttpClient $httpClient = null, $options = array())
+    public function __construct(GClient $client = null, $options = array())
     {
         if (!extension_loaded('openssl')) {
             // @codeCoverageIgnoreStart
@@ -56,23 +52,7 @@ class Client
             // @codeCoverageIgnoreEnd
         }
 
-        if ($httpClient === null) {
-
-            // @codeCoverageIgnoreStart
-            if (function_exists('curl_init')) {
-                $httpClient = new CurlHttpClient();
-            } else if (version_compare(PHP_VERSION, '5.2.10') >= 0) {
-                $httpClient = new BasicHttpClient();
-            } else {
-                if (!@include('HTTP/Client.php')) {
-                    throw new RakutenRwsException('Failed to include Pear HTTP_Client');
-                }
-
-                $httpClient = new PearHttpClient();
-            }
-            // @codeCoverageIgnoreEnd
-        }
-        $this->httpClient = $httpClient;
+        $this->httpClient = $client ? $client : new GClient();
         $this->options = $options;
     }
 
@@ -81,6 +61,7 @@ class Client
      * Sets the DeveloperID
      *
      * @param string $developerId The DeveloperID
+     * @return $this
      */
     public function setApplicationId($developerId)
     {
@@ -102,6 +83,7 @@ class Client
      * Sets the AffiliateID
      *
      * @param string $affiliateId The AffiliateID
+     * @return $this
      */
     public function setAffiliateId($affiliateId)
     {
@@ -123,6 +105,7 @@ class Client
      * Sets Application Secret
      *
      * @param string $secret The Application Secret
+     * @return $this
      */
     public function setSecret($secret)
     {
@@ -134,6 +117,7 @@ class Client
      * Sets Redirect Url
      *
      * @param string $redirectUrl The Redirect URL
+     * @return $this
      */
     public function setRedirectUrl($redirectUrl)
     {
@@ -150,13 +134,12 @@ class Client
     public function getAuthorizeUrl($scope)
     {
         $url = 'https://app.rakuten.co.jp/services/authorize';
-        $parameter = array();
-        $parameter = array(
+        $parameter = [
             'response_type' => 'code',
             'client_id'     => $this->developerId,
             'redirect_uri'  => $this->redirectUrl,
             'scope'         => $scope
-        );
+        ];
 
         return $url.'?'.http_build_query($parameter);
     }
@@ -189,21 +172,21 @@ class Client
         }
 
         $url = $this->getAccessTokenUrl();
-        $parameter = array(
+        $parameter = [
             'grant_type'    => 'authorization_code',
             'client_id'     => $this->developerId,
             'client_secret' => $this->secret,
             'code'          => $code,
             'redirect_uri'  => $this->redirectUrl
-        );
+        ];
 
         $response = $this->httpClient->post(
             $url,
             $parameter
         );
 
-        if ($response->getCode() == 200) {
-            $this->accessTokenInfo = json_decode($response->getContents(), true);
+        if ($response->getStatusCode() == 200) {
+            $this->accessTokenInfo = json_decode($response->getBody()->getContents(), true);
             if (isset($this->accessTokenInfo['access_token'])) {
                 $this->accessToken = $this->accessTokenInfo['access_token'];
 
@@ -225,9 +208,7 @@ class Client
     }
 
     /**
-     * Gets Http Client instance
-     *
-     * @@return null|\RakutenRws\AbstractHttpClient|AbstractHttpClient|BasicHttpClient|CurlHttpClient|PearHttpClient  The Http Client
+     * @return \GuzzleHttp\Client|null
      */
     public function getHttpClient()
     {
@@ -235,25 +216,38 @@ class Client
     }
 
     /**
-     * Sets the proxy to use connect rakuten service
-     *
-     * @param string $proxy The proxy
-     */
-    public function setProxy($proxy)
-    {
-        $this->httpClient->setProxy($proxy);
-        return $this;
-    }
-
-    /**
      * Sets Application Secret
      *
      * @param string $secret The Application Secret
+     * @return $this
      */
     public function setBaseUrl($baseUrl)
     {
         $this->baseUrl = $baseUrl;
         return $this;
+    }
+
+    /**
+     * loadClass
+     *
+     * @param $operation
+     * @param $version
+     * @param $forceVersionCheck
+     * @return mixed
+     */
+    protected function loadClass($operation, $version, $forceVersionCheck)
+    {
+        $operation = preg_replace('/\//', '', $operation);
+        $className = 'RakutenRws\Api\Definition\\'.$operation;
+        if (!class_exists($className)) {
+            throw new \LogicException('Operation is not definied.');
+        }
+        $api = new $className($this, $this->options);
+        $api->setBaseUrl($this->baseUrl ? $this->baseUrl : self::DEFAULT_BASE_URL);
+        if ($version !== null) {
+            $api->setVersion($version, $forceVersionCheck);
+        }
+        return $api;
     }
 
     /**
@@ -269,19 +263,24 @@ class Client
      */
     public function execute($operation, $parameter = array(), $version = null, $forceVersionCheck = false)
     {
-        // remove '/' from operation
-        $operation = preg_replace('/\//', '', $operation);
-        $className = 'RakutenRws\Api\Definition\\'.$operation;
-        if (!class_exists($className)) {
-            throw new \LogicException('Operation is not definied.');
-        }
-
-        $api = new $className($this, $this->options);
-        $api->setBaseUrl($this->baseUrl ? $this->baseUrl : self::DEFAULT_BASE_URL);
-        if ($version !== null) {
-            $api->setVersion($version, $forceVersionCheck);
-        }
-
+        $api = $this->loadClass($operation, $version, $forceVersionCheck);
         return $api->execute($parameter);
+    }
+
+    /**
+     * Executes Async API
+     *
+     * @param string $operation The operation name
+     * @param array  $parameter The request parameter
+     * @param string $version   The API version
+     * @param boolean $forceVersionCheck   The API version
+     * @throws \LogicException
+     * @throws RakutenRwsException
+     * @return mixed
+     */
+    public function executeAsync($operation, $parameter = array(), $version = null, $forceVersionCheck = false)
+    {
+        $api = $this->loadClass($operation, $version, $forceVersionCheck);
+        return $api->executeAsync($parameter);
     }
 }

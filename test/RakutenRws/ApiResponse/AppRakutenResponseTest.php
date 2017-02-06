@@ -57,7 +57,7 @@ class AppRakutenResponseTest extends TestCase
 
     /**
      *
-     * @expectedException RakutenRws\RakutenRwsException
+     * @expectedException \RakutenRws\RakutenRwsException
      */
     public function testBrokenData() {
         $httpResponse = new HttpResponse(

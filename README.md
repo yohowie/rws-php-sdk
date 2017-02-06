@@ -12,7 +12,7 @@ Rakuten Web Service SDK for PHP は、PHPアプリケーションから
 動作要件
 --------
 
-- PHP5.3.0以上 ( [curl拡張](http://php.net/manual/ja/book.curl.php) 導入を推奨)
+- PHP5.5.0以上 ( [curl拡張](http://php.net/manual/ja/book.curl.php) 導入を推奨)
   か curl拡張の導入が必要です。
 
 ダウンロード
@@ -128,9 +128,9 @@ $client = new Client();
 $client->setApplicationId('YOUR_APPLICATION_ID');
 $client->setAffiliateId('YOUR_AFFILIATE_ID');
 
-$response = $client->execute('IchibaItemSearch', array(
+$response = $client->executeAsync('IchibaItemSearch', array(
   'keyword' => 'うどん'
-));
+))->wait();
 
 if ($response->isOk()) {
     // レスポンスを foreach でアクセスできます
@@ -197,9 +197,9 @@ if (!$client->fetchAccessTokenFromCode()) {
 
 // FavoriteBookmarkList で お気に入りブックマークを
 // 10件取得します
-$client->execute('FavoriteBookmarkList', array(
+$client->executeAsync('FavoriteBookmarkList', array(
     'hits' => 10
-));
+))->wait();
 
 if ($response->isOk()) {
   foreach ($response as $item) {
@@ -213,26 +213,11 @@ if ($response->isOk()) {
 プロキシの設定
 --------------
 
-*RakutenRws_Client::setProxy()* で、プロキシを通してAPIにアクセスすることができます。
+環境変数を設定することによりProxyを設定することができます。
 
-以下が利用例になります
-
-```php
-<?php
-
-require_once './vendor/autoload.php';
-
-use RakutenRws\Client;
-
-$client = new Client();
-$client->setProxy('proxy-host.example.com:port');
-$client->setApplicationId('YOUR_APPLICATION_ID');
-$client->setAffiliateId('YOUR_AFFILIATE_ID');
-
-// このリクエストは、プロキシを通して行われます。
-$response = $client->execute('IchibaItemSearch', array(
-  'keyword' => 'うどん'
-));
+```
+HTTP_PROXY=hostname:9000
+HTTPS_PROXY=hostname:9000
 ```
 
 旧バージョンからのバージョンアップ

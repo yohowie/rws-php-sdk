@@ -25,4 +25,5 @@ interface ApiInterface
     public function getVersion();
     public function setVersion($version);
     public function execute($parameter);
+    public function executeAsync($parameter);
 }

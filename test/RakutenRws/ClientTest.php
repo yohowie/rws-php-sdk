@@ -2,12 +2,12 @@
 
 namespace RakutenRws;
 
+use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
-use RakutenRws\Client;
-use RakutenRws\HttpClient\AbstractHttpClient;
-use RakutenRws\HttpResponse;
-use RakutenRws\ApiResponse;
+use \Mockery;
+
+use GuzzleHttp\Client as GClient;
 
 class ClientTest extends TestCase
 {
@@ -33,44 +33,35 @@ class ClientTest extends TestCase
      */
     public function testfetchAccessTokenFromCode1()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $url = 'https://app.rakuten.co.jp/services/token';
-        $param = array(
-            'grant_type'    => 'authorization_code',
-            'client_id'     => '123',
-            'client_secret' => 'foo-bar',
-            'code'          => 'codecode',
-            'redirect_uri'  => 'http://example.com'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
-            'access_token'  => 'abc',
-            'refresh_token' => 'def',
-            'token_type'    => 'BEARER',
-            'expires_in'    => 300,
-            'scope'         => 'the_scope'
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('post')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('post')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
+                'https://app.rakuten.co.jp/services/token',
+                [
+                    'grant_type'    => 'authorization_code',
+                    'client_id'     => '123',
+                    'client_secret' => 'foo-bar',
+                    'code'          => 'codecode',
+                    'redirect_uri'  => 'http://example.com'
+                ]
             )
-            ->will($this->returnValue($httpResponse));
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'access_token'  => 'abc',
+                'refresh_token' => 'def',
+                'token_type'    => 'BEARER',
+                'expires_in'    => 300,
+                'scope'         => 'the_scope'
+            ])));
 
-        $clinet = new Client($httpClient);
+        $client = new Client($httpClient);
 
-        $clinet->setApplicationId('123');
-        $clinet->setSecret('foo-bar');
-        $clinet->setRedirectUrl('http://example.com');
+        $client->setApplicationId('123');
+        $client->setSecret('foo-bar');
+        $client->setRedirectUrl('http://example.com');
 
-        $this->assertEquals('abc', $clinet->fetchAccessTokenFromCode('codecode'));
-        $this->assertEquals('abc', $clinet->getAccessToken());
+        $this->assertEquals('abc', $client->fetchAccessTokenFromCode('codecode'));
+        $this->assertEquals('abc', $client->getAccessToken());
     }
 
     /**
@@ -79,40 +70,32 @@ class ClientTest extends TestCase
      */
     public function testfetchAccessTokenFromCode2()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
 
-        $url = 'https://app.rakuten.co.jp/services/token';
-        $param = array(
-            'grant_type'    => 'authorization_code',
-            'client_id'     => '123',
-            'client_secret' => 'foo-bar',
-            'code'          => 'codecode',
-            'redirect_uri'  => 'http://example.com'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 401, array(), json_encode(array(
-            'error'             => 'invalid_request',
-            'error_description' => 'invalid code'
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('post')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('post')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
+                "https://app.rakuten.co.jp/services/token",
+                [
+                    'grant_type'    => 'authorization_code',
+                    'client_id'     => '123',
+                    'client_secret' => 'foo-bar',
+                    'code'          => 'codecode',
+                    'redirect_uri'  => 'http://example.com'
+                ]
             )
-            ->will($this->returnValue($httpResponse));
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'error'             => 'invalid_request',
+                'error_description' => 'invalid code'
+            ])));
 
-        $clinet = new Client($httpClient);
+        $client = new Client($httpClient);
 
-        $clinet->setApplicationId('123');
-        $clinet->setSecret('foo-bar');
-        $clinet->setRedirectUrl('http://example.com');
+        $client->setApplicationId('123');
+        $client->setSecret('foo-bar');
+        $client->setRedirectUrl('http://example.com');
 
-        $this->assertNull($clinet->fetchAccessTokenFromCode('codecode'));
+        $this->assertNull($client->fetchAccessTokenFromCode('codecode'));
     }
 
     /**
@@ -121,35 +104,26 @@ class ClientTest extends TestCase
      */
     public function testfetchAccessTokenFromCode3()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $url = 'https://app.rakuten.co.jp/services/token';
-        $param = array(
-            'grant_type'    => 'authorization_code',
-            'client_id'     => '123',
-            'client_secret' => 'foo-bar',
-            'code'          => 'codecode',
-            'redirect_uri'  => 'http://example.com'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
-            'access_token'  => 'abc',
-            'refresh_token' => 'def',
-            'token_type'    => 'BEARER',
-            'expires_in'    => 300,
-            'scope'         => 'the_scope'
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('post')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('post')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
-            )
-            ->will($this->returnValue($httpResponse));
+                "https://app.rakuten.co.jp/services/token",
+                [
+                    'grant_type'    => 'authorization_code',
+                    'client_id'     => '123',
+                    'client_secret' => 'foo-bar',
+                    'code'          => 'codecode',
+                    'redirect_uri'  => 'http://example.com'
+                ])
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'access_token'  => 'abc',
+                'refresh_token' => 'def',
+                'token_type'    => 'BEARER',
+                'expires_in'    => 300,
+                'scope'         => 'the_scope'
+            ])));
+
 
         $clinet = new Client($httpClient);
 
@@ -180,32 +154,22 @@ class ClientTest extends TestCase
      */
     public function testfetchAccessTokenFromCode5_BrokenData()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $url = 'https://app.rakuten.co.jp/services/token';
-        $param = array(
-            'grant_type'    => 'authorization_code',
-            'client_id'     => '123',
-            'client_secret' => 'foo-bar',
-            'code'          => 'codecode',
-            'redirect_uri'  => 'http://example.com'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
-            'error'             => 'invalid_request',
-            'error_description' => 'invalid code'
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('post')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('post')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
-            )
-            ->will($this->returnValue($httpResponse));
+                "https://app.rakuten.co.jp/services/token",
+                [
+                    'grant_type'    => 'authorization_code',
+                    'client_id'     => '123',
+                    'client_secret' => 'foo-bar',
+                    'code'          => 'codecode',
+                    'redirect_uri'  => 'http://example.com'
+                ])
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'error'             => 'invalid_request',
+                'error_description' => 'invalid code'
+            ])));
 
         $clinet = new Client($httpClient);
 
@@ -217,45 +181,28 @@ class ClientTest extends TestCase
     }
 
     /**
-     *
-     * @test
-     */
-    public function testSetProxy()
-    {
-        $clinet = new Client();
-        $clinet->setProxy('http://example.com');
-        $this->assertEquals('http://example.com', $clinet->getHttpClient()->getProxy());
-    }
-
-    /**
      * testExecute
      *
      * @test
      */
     public function testExecute()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $url = 'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108';
-        $param = array(
-            'applicationId' => '123',
-            'affiliateId'   => '456'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
-            'data' => 'the response'
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('get')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('request')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
-            )
-            ->will($this->returnValue($httpResponse));
+                'GET',
+                'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108',
+                [
+                    'http_errors'=>false,
+                    'query' => [
+                        'applicationId' => '123',
+                        'affiliateId'   => '456'
+                    ]
+                ])
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'data' => 'the response'
+            ])));
 
         $clinet = new Client($httpClient);
         $clinet->setApplicationId('123');
@@ -271,28 +218,22 @@ class ClientTest extends TestCase
      */
     public function testExecuteWithOperationAlias()
     {
-        $httpClient = $this->getMockBuilder(AbstractHttpClient::class)
-            ->setMethods(['post', 'get'])
-            ->setMockClassName('httpClient_for_'.__FUNCTION__)
-            ->getMock();
-
-        $url = 'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108';
-        $param = array(
-            'applicationId' => '123',
-            'affiliateId'   => '456'
-        );
-
-        $httpResponse = new HttpResponse($url, $param, 200, array(), json_encode(array(
-            'data' => 'the response'
-        )));
-
-        $httpClient->expects($this->once())
-            ->method('get')
+        $httpClient = Mockery::mock(GClient::class);
+        $httpClient->shouldReceive('request')
             ->with(
-                $this->equalTo($url),
-                $this->equalTo($param)
-            )
-            ->will($this->returnValue($httpResponse));
+                'GET',
+                'https://app.rakuten.co.jp/services/api/DummyService/DummyOperation2/19890108',
+                [
+                    'http_errors'=>false,
+                    'query' => [
+                        'applicationId' => '123',
+                        'affiliateId'   => '456'
+                    ]
+                ])
+            ->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'data' => 'the response'
+            ])));
 
         $clinet = new Client($httpClient);
         $clinet->setApplicationId('123');
