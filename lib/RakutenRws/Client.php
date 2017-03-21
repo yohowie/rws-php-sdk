@@ -161,16 +161,8 @@ class Client
      * @return string The Access Token, If response is invalid return null
      * @throws LogicException
      */
-    public function fetchAccessTokenFromCode($code = null)
+    public function fetchAccessTokenFromCode($code)
     {
-        if ($code === null) {
-            if (!isset($_GET['code'])) {
-                throw new \LogicException("A parameter code is not set.");
-            }
-
-            $code = $_GET['code'];
-        }
-
         $url = $this->getAccessTokenUrl();
         $parameter = [
             'grant_type'    => 'authorization_code',
@@ -196,6 +188,19 @@ class Client
 
         return null;
     }
+
+    /**
+     * Set AccessToken
+     *
+     * @param $accessToken
+     * @return $this
+     */
+    public function setAccessToken($accessToken)
+    {
+        $this->accessToken = $accessToken;
+        return $this;
+    }
+
 
     /**
      * Gets the fetched AccessToken

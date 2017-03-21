@@ -131,23 +131,10 @@ class ClientTest extends TestCase
         $clinet->setSecret('foo-bar');
         $clinet->setRedirectUrl('http://example.com');
 
-        $_GET['code'] = 'codecode';
-        $this->assertEquals('abc', $clinet->fetchAccessTokenFromCode());
+        $this->assertEquals('abc', $clinet->fetchAccessTokenFromCode('codecode'));
         $this->assertEquals('abc', $clinet->getAccessToken());
     }
-
-    /**
-     *
-     * @test
-     * @expectedException LogicException
-     */
-    public function testfetchAccessTokenFromCode4_Error()
-    {
-        $clinet = new Client();
-        unset($_GET['code']);
-        $clinet->fetchAccessTokenFromCode();
-    }
-
+    
     /**
      *
      * @test
